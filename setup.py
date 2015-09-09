@@ -2,10 +2,11 @@
 # -*- coding: utf-8 -*-
 from setuptools import setup, find_packages
 
+import os
 from codecs import open
 
-with open(os.path.join(here, 'README.md'), encoding='utf-8') as f:
-    long_description = f.read()
+# with open(os.path.join(here, 'README.md'), encoding='utf-8') as f:
+#     long_description = f.read()
 
 
 setup(
@@ -17,7 +18,7 @@ setup(
     version='0.1',
 
     description='Filter variants based on frequencies',
-    long_description=long_description,
+    # long_description=long_description,
     # What does your project relate to? Separate with spaces.
     keywords='sequencing exome genome',
     author='Måns Magnusson',
@@ -42,7 +43,6 @@ setup(
     tests_require=[
         'pytest',
     ],
-    cmdclass=dict(test=PyTest),
 
     # To provide executable scripts, use entry points in preference to the
     # "scripts" keyword. Entry points provide cross-platform support and
@@ -50,7 +50,7 @@ setup(
     # target platform.
     entry_points={
         'console_scripts': [
-            'filter_variants = filter_variants.cli:root_command',
+            'filter_variants = filter_variants.cli.root:cli',
         ],
     },
 
