@@ -6,6 +6,10 @@ Right now only works with bg-zipped and tabix indexed 1000G vcf file.
 
 ##Installation
 
+```pip install filter-variants```
+
+or
+
 ```
 >git clone https://github.com/moonso/filter_variants.git
 >cd filter_variants
