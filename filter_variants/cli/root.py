@@ -64,6 +64,8 @@ def cli(variant_file, thousand_g, treshold, outfile, annotate, keyword,
         verbose, logfile):
     """
     Filter vcf variants based on their frequency.
+    
+    Variants and 1000G file should be splitted and normalized(with vt).
     """
     loglevel = LEVELS.get(min(verbose,2), "WARNING")
     init_log(root_logger, logfile, loglevel)
@@ -74,68 +76,100 @@ def cli(variant_file, thousand_g, treshold, outfile, annotate, keyword,
     logger = logging.getLogger("filter_variants.cli.root")
     logger.info("Running filter_variants version {0}".format(__version__))
 
-    logger.info("Initializing a Header Parser")
-    head = HeaderParser()
+    # logger.info("Initializing a Header Parser")
+    # head = HeaderParser()
     
     if thousand_g:
         logger.debug("Opening 1000G frequency file with tabix open")
         thousand_g_handle = tabix.open(thousand_g)
         logger.debug("1000G frequency file opened")
-    
+    else:
+        logger.warning("Please provide a 1000G file")
+        logger.info("Exiting")
+        sys.exit(1)
+        
     # print_headers(head, outfile)
-    headers_done = False
+    
     for line in variant_file:
         line = line.rstrip()
         if line.startswith('#'):
-            if line.startswith('##'):
-                head.parse_meta_data(line)
+            if outfile:
+                outfile.write(line+'\n')
             else:
-                head.parse_header_line(line)
+                print(line)
         else:
-            if not headers_done:
-                if annotate:
-                    if keyword in head.info_dict:
-                        logger.info("Variants already annotated")
-                        annotate = False
-                    else:
-                        head.add_info(
-                            info_id=keyword,
-                            number='A',
-                            entry_type='Float', 
-                            description="The 1000 genomes frequency"
-                            )
-                print_headers(head, outfile)
-                headers_done = True
-            
             variant_line = line.split('\t')
-            
             chrom = variant_line[0].strip('chr')
             position = int(variant_line[1])
-            alternatives = variant_line[4].split(',')
-            
-            frequencies = []
-            if thousand_g:
-                for alternative in alternatives:
-                    frequency = get_thousand_g_frequency(
-                            chrom = chrom,
-                            pos = position,
-                            alt = alternative,
-                            tabix_reader = thousand_g_handle
-                        )
-                    if frequency:
-                        frequencies.append(frequency)
-                    else:
-                        frequencies.append('0')
-            if annotate:
-                for frequency in frequencies:
-                    if frequency != '0':
-                        line = add_vcf_info(line, keyword, ','.join(frequencies))
-            for frequency in frequencies:
+            alternative = variant_line[4]
+            frequency = get_thousand_g_frequency(
+                chrom = chrom,
+                pos = position,
+                alt = alternative,
+                tabix_reader = thousand_g_handle
+                )
+            if frequency:
                 if float(frequency) < treshold:
                     print_variant(line, outfile)
                 else:
                     logger.debug("Frequency {0} is higher than treshold"\
                     " {1}. Skip printing variant".format(frequency, treshold))
+            else:
+                print_variant(line, outfile)
+    
+    # headers_done = False
+    # for line in variant_file:
+    #     line = line.rstrip()
+    #     if line.startswith('#'):
+    #         if line.startswith('##'):
+    #             head.parse_meta_data(line)
+    #         else:
+    #             head.parse_header_line(line)
+    #     else:
+    #         if not headers_done:
+    #             if annotate:
+    #                 if keyword in head.info_dict:
+    #                     logger.info("Variants already annotated")
+    #                     annotate = False
+    #                 else:
+    #                     head.add_info(
+    #                         info_id=keyword,
+    #                         number='A',
+    #                         entry_type='Float',
+    #                         description="The 1000 genomes frequency"
+    #                         )
+    #             print_headers(head, outfile)
+    #             headers_done = True
+    #
+    #         variant_line = line.split('\t')
+    #
+    #         chrom = variant_line[0].strip('chr')
+    #         position = int(variant_line[1])
+    #         alternatives = variant_line[4].split(',')
+    #
+    #         frequencies = []
+    #         if thousand_g:
+    #             for alternative in alternatives:
+    #                 frequency = get_thousand_g_frequency(
+    #                         chrom = chrom,
+    #                         pos = position,
+    #                         alt = alternative,
+    #                         tabix_reader = thousand_g_handle
+    #                     )
+    #                 if frequency:
+    #                     frequencies.append(frequency)
+    #                 else:
+    #                     frequencies.append('0')
+    #         if annotate:
+    #             for frequency in frequencies:
+    #                 if frequency != '0':
+    #                     line = add_vcf_info(line, keyword, ','.join(frequencies))
+    #         for frequency in frequencies:
+    #             if float(frequency) < treshold:
+    #                 print_variant(line, outfile)
+    #             else:
+    #                 logger.debug("Frequency {0} is higher than treshold"\
+    #                 " {1}. Skip printing variant".format(frequency, treshold))
 
 if __name__ == '__main__':
     cli()
