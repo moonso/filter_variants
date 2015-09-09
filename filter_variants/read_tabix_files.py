@@ -83,7 +83,7 @@ def get_thousand_g_frequency(chrom, pos, alt, tabix_reader):
         Args:
             chrom (str): The chromosome that the variant resides on
             pos (int): The startposition for the variant
-            alt (list): A list of strings with the alternatives
+            alt (str): The altrnative
             thousand_g_handle (TabixHandle): A pytabix file handle
         
         Returns:
@@ -91,16 +91,15 @@ def get_thousand_g_frequency(chrom, pos, alt, tabix_reader):
     """
     logger = logging.getLogger(__name__)
     logger.debug("Checking thousand genomes ferquency for variant on chromosome"\
-                 " {0}, position {1}, alternative {2}".format(chrom, pos, ','.join(alt)))
+                 " {0}, position {1}, alternative {2}".format(chrom, pos, alt))
     
     try:
         for record in tabix_reader.query(chrom, pos-1, pos):
             logger.debug("Found record {0}".format(record))
-            i = 0
             #We can get multiple rows so need to check each one
             #We also need to check each one of the alternatives per row
             for i,alternative in enumerate(record[4].split(',')):
-                if alternative in alt:
+                if alternative == alt:
                     logger.debug("{0} matches alt".format(alternative))
                     for info in record[7].split(';'):
                         info = info.split('=')
