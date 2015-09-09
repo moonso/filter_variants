@@ -26,7 +26,7 @@ setup(
     license='MIT',
 
     # The project's main homepage
-    url='',
+    url='https://github.com/moonso/filter_variants',
 
     packages=find_packages(exclude=('tests*', 'docs', 'examples')),
 
