@@ -36,7 +36,7 @@ setup(
     zip_safe=False,
 
     install_requires=[
-        'Click',
+        'click',
         'setuptools',
         'pytabix'
     ],

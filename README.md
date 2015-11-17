@@ -2,6 +2,9 @@
 
 Small script to filter variants based on their frequency.
 
+User can use multiple frequencies by repeating the ```--keyword``` option.
+If vcf file is not annotated the user can point to bgzip and tabix indexed sources to check annotation.
+
 Right now only works with bg-zipped and tabix indexed 1000G vcf file.
 
 ##Installation
