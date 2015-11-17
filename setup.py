@@ -15,7 +15,7 @@ setup(
     # Versions should comply with PEP440. For a discussion on
     # single-sourcing the version across setup.py and the project code,
     # see http://packaging.python.org/en/latest/tutorial.html#version
-    version='0.2.1',
+    version='0.3',
 
     description='Filter variants based on frequencies',
     # long_description=long_description,
@@ -38,7 +38,9 @@ setup(
     install_requires=[
         'click',
         'setuptools',
-        'pytabix'
+        'pytabix',
+        'vcftoolbox',
+        'extract_vcf',
     ],
     tests_require=[
         'pytest',
