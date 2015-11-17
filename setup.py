@@ -1,9 +1,20 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
-from setuptools import setup, find_packages
-
+import sys
 import os
+
+try:
+    from setuptools import setup, find_packages
+except ImportError:
+    from distutils.core import setup
+
+import pkg_resources
 from codecs import open
+
+# Shortcut for building/publishing to Pypi
+if sys.argv[-1] == 'publish':
+    os.system('python setup.py sdist bdist_wheel upload')
+    sys.exit()
 
 # with open(os.path.join(here, 'README.md'), encoding='utf-8') as f:
 #     long_description = f.read()
